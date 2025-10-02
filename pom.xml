@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.2.3</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.example</groupId>
+	<artifactId>testserver</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>testserver</name>
+	<description>RESTful web application</description>
+	<repositories>
+		<repository>
+			<id>github</id>
+			<name>ETERNA GitHub Packages</name>
+			<url>https://maven.pkg.github.com/ETERNA-earkiv/*</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>
+	<properties>
+		<java.version>17</java.version>
+		<springboot.version>3.4.0</springboot.version>
+		<commons.fileupload.version>2.0.0-M4</commons.fileupload.version>
+	</properties>
+	<profiles>
+		<profile>
+			<id>debug-main-suspend</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<version>${springboot.version}</version>
+						<configuration>
+							<skip>false</skip>
+							<additionalClasspathElements>
+								<additionalClasspathElement>
+									${project.build.directory}/${project.build.finalName}
+								</additionalClasspathElement>
+							</additionalClasspathElements>
+							<jvmArguments>
+								-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005
+								<!-- Remove after upgrade to spring-boot 3-->
+								-Dorg.springframework.boot.logging.LoggingSystem=none
+								<!-- Remove -->
+								-Droda.environment.collect.version=false
+								--add-opens java.base/java.util=ALL-UNNAMED
+								--add-opens java.base/java.lang=ALL-UNNAMED
+							</jvmArguments>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>33.5.0-jre</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-fileupload2-core</artifactId>
+			<version>${commons.fileupload.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-fileupload2-jakarta-servlet6</artifactId>
+			<version>${commons.fileupload.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.roda-project</groupId>
+			<artifactId>roda-common-data</artifactId>
+			<version>0.4.0</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
