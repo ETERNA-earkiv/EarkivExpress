@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+************************************************************************************************************************
+  Version: 1.3 (based on "ver 1.2 pgip.xsd")
+  Created: 2024-02-14
+  Updated: 2024-12-02
+  Author: Gabriel Barros <gbarros@keep.pt>
+  Updated by: u0064946
+************************************************************************************************************************
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" vc:minVersion="1.1"
+           xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning">
+    <xs:element name="pgip">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" name="objectId" type="idType"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="title" type="xs:string"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="description" type="xs:string"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="securityClassification" type="securityClassificationVocabularyType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="language" type="xs:language"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="dateReceived" type="ISO8601DateTimeWithOptionalTimezoneType"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="closed" type="ISO8601DateTimeWithOptionalTimezoneType"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="created" type="ISO8601DateTimeWithOptionalTimezoneType"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="originated" type="ISO8601DateTimeWithOptionalTimezoneType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="date" type="dateTimeWithLabelType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="administrativeOfficials" type="stringWithLabelType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="administrativeUnits" type="stringWithLabelType"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="caseType" type="xs:string"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="classification" type="stringWithLabelType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="relation" type="relationType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="relatedOrganisation" type="relatedOrganisationType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="relatedPerson" type="relatedPersonType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="relatedLocation" type="relatedLocationType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="relatedItem" type="relatedItemType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="relatedEvent" type="relatedEventType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="note" type="stringWithLabelType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="administrativeNotes" type="stringWithLabelType"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="creator" type="xs:string"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="conformsTo" type="PGIPVersionVocabularyType"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="informationOwner" type="xs:string"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="legalRestriction" type="xs:string"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="submissionAgreementId" type="idType"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="type" type="typeVocabularyType"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="retentionStartDate" type="ISO8601DateTimeWithOptionalTimezoneType"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="retentionPeriod" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!--
+    ********************************************************************************************************************
+    Complex types
+    ********************************************************************************************************************
+    -->
+    <!-- Related Organisation -->
+    <xs:complexType name="relatedOrganisationType">
+        <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="id" type="idRelatedOrganisationType"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="name" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="contact" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="role" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="address" type="addressType"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="note" type="stringWithLabelType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Related Person v1.3 -->
+    <!-- elementet name får maxOccurs="1" -->
+    <xs:complexType name="relatedPersonType">
+        <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="id" type="idRelatedPersonType"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="birthDate" type="xs:string"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="name" type="nameType"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="aliases" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="gender" type="genderVocabularyType"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="nationality" type="stringWithLabelType"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="role" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="protectedPersonalData" type="protectedPersonalDataType"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="address" type="addressType"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="note" type="stringWithLabelType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Related Location -->
+    <xs:complexType name="relatedLocationType">
+        <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="site" type="stringWithLabelType"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="address" type="addressType"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="note" type="stringWithLabelType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Related Item v1.3 -->
+    <!-- id får type="stringWithLabelType" -->
+    <xs:complexType name="relatedItemType">
+        <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="id" type="stringWithLabelType"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="description" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="note" type="stringWithLabelType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Related Event v1.3 -->
+    <xs:complexType name="relatedEventType">
+        <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="name" type="xs:string"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="eventType" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="startTime" type="ISO8601DateTimeWithOptionalTimezoneType"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="endTime" type="ISO8601DateTimeWithOptionalTimezoneType"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="description" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="address" type="addressType"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="note" type="stringWithLabelType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Relation -->
+    <xs:complexType name="relationType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="type" type="relationAttributeType" use="required"/>
+                <xs:attribute name="label" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Address v1.3 -->
+    <!-- Lägg till element för koordinater -->
+    <xs:complexType name="addressType">
+        <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="streetAddress" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="postalCode" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="city" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="municipality" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="municipalityPart" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="county" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="country" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="coAddress" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="coordinates" type="stringWithLabelType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Name v1.3 -->
+    <!-- fullName flyttas in i samma sequence som first-, middle-, och lastName -->
+    <xs:complexType name="nameType">
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" name="fullName" type="xs:string"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="firstName" type="xs:string"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="middleName" type="xs:string"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="lastName" type="xs:string"/>
+            </xs:sequence>
+    </xs:complexType>
+
+    <!--
+    ********************************************************************************************************************
+    Complex types - Identifiers
+    ********************************************************************************************************************
+    -->
+    <!-- Related Organization -->
+    <xs:complexType name="idRelatedOrganisationType">
+        <xs:simpleContent>
+            <xs:extension base="idRelatedOrganisationValueType">
+                <xs:attribute name="type" type="idRelatedOrganisationAttributeType" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Related Person -->
+    <xs:complexType name="idRelatedPersonType">
+        <xs:simpleContent>
+            <xs:extension base="idRelatedPersonValueType">
+                <xs:attribute name="type" type="idRelatedPersonAttributeType" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <!--
+    ********************************************************************************************************************
+    Complex types - Misc
+    ********************************************************************************************************************
+    -->
+    <!-- String with label type
+    Unlimited text size with mandatory label
+    -->
+    <xs:complexType name="stringWithLabelType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="label" type="nonEmptyStringType" />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Date time with label type
+    ISO 8601 with date, time, timezone and a mandatory label
+    Used for element 'date' at root level
+    -->
+    <xs:complexType name="dateTimeWithLabelType">
+        <xs:simpleContent>
+            <xs:extension base="ISO8601DateTimeWithOptionalTimezoneType">
+                <xs:attribute name="label" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <!--
+    ********************************************************************************************************************
+    Simple types - Controlled Vocabulary
+    ********************************************************************************************************************
+    -->
+
+    <!-- ID Related Organization Attribute -->
+    <xs:simpleType name="idRelatedOrganisationAttributeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="organisationsnummer"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- ID Related Person Attribute -->
+    <xs:simpleType name="idRelatedPersonAttributeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="personnummer"/>
+            <xs:enumeration value="annanIdentitetsbeteckning"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Relation Attribute -->
+    <xs:simpleType name="relationAttributeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="internal"/>
+            <xs:enumeration value="external"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Other birthdate Attribute tas bort -->
+
+    <!-- Security Classification -->
+    <xs:simpleType name="securityClassificationVocabularyType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ÖPPEN"/>
+            <xs:enumeration value="BEGRÄNSAT SKYDDSVÄRDE"/>
+            <xs:enumeration value="HÖGT SKYDDSVÄRDE"/>
+            <xs:enumeration value="MYCKET HÖGT SKYDDSVÄRDE"/>
+            <xs:enumeration value="BEGRÄNSAT HEMLIG"/>
+            <xs:enumeration value="KONFIDENTIELL"/>
+            <xs:enumeration value="HEMLIG"/>
+            <xs:enumeration value="KVALIFICERAT HEMLIG"/>
+            <xs:enumeration value="EU PUBLIC"/>
+            <xs:enumeration value="EU RESTRICTED"/>
+            <xs:enumeration value="EU CONFIDENTIAL"/>
+            <xs:enumeration value="EU SECRET"/>
+            <xs:enumeration value="EU TOP SECRET"/>
+            <xs:enumeration value="NATO PUBLIC"/>
+            <xs:enumeration value="NATO RESTRICTED"/>
+            <xs:enumeration value="NATO CONFIDENTIAL"/>
+            <xs:enumeration value="NATO SECRET"/>
+            <xs:enumeration value="COSMIC TOP SECRET"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Gender -->
+    <xs:simpleType name="genderVocabularyType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Man"/>
+            <xs:enumeration value="Kvinna"/>
+            <xs:enumeration value="Ickebinär"/>
+            <xs:enumeration value="Okänt"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Type -->
+    <xs:simpleType name="typeVocabularyType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ARKIV"/>
+            <xs:enumeration value="SAMLING"/>
+            <xs:enumeration value="DATABAS"/>
+            <xs:enumeration value="DATASET"/>
+            <xs:enumeration value="ÄRENDEAKT"/>
+            <xs:enumeration value="HANDLING"/>
+            <xs:enumeration value="DOKUMENT"/>
+            <xs:enumeration value="OBJEKT"/>
+            <xs:enumeration value="AUDIOVIDEO"/>
+            <xs:enumeration value="GIS"/>
+            <xs:enumeration value="CAD"/>
+            <xs:enumeration value="PRODUKT"/>
+            <xs:enumeration value="KÄLLKOD"/>
+            <xs:enumeration value="KONTEXT"/>
+            <xs:enumeration value="ANNAT"/>
+            <xs:enumeration value="OKÄNT"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- PGIP Version -->
+    <xs:simpleType name="PGIPVersionVocabularyType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="PGIP 1.3"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!--
+    ********************************************************************************************************************
+    Simple types - Value restrictions
+    ********************************************************************************************************************
+    -->
+    <!-- ID
+    Validate format: Swedish letters (ÅÄÖ and åäö), upper and lower-case letters, numbers, dashes, dots, space, colon and slash
+    Used for ObjectID, Related Item and Submission Agreement
+    -->
+    <xs:simpleType name="idType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[ÅÄÖåäöa-zA-Z0-9/.\- :]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Related Person ID
+    Optimal format: 000000-0000 (6 numbers, one dash, 4 numbers), otherwise accept Swedish letters (ÅÄÖ and åäö), upper and lower-case
+    letters, numbers, dashes, dots, space, colon and slash
+    -->
+    <xs:simpleType name="idRelatedOrganisationValueType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d{6}-\d{4}"/>
+            <xs:pattern value="[ÅÄÖåäöa-zA-Z0-9/.\- :]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Related Person ID
+    Optimal Format: YYYYMMDD-XXXX or YYMMDD-XXXX, otherwise accept Swedish letters (ÅÄÖ and åäö), upper and lower-case
+    letters, numbers, dashes, dots, space, colon and slash
+    -->
+    <xs:simpleType name="idRelatedPersonValueType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d{8}-\d{4}"/>
+            <xs:pattern value="\d{6}-\d{4}"/>
+            <xs:pattern value="[ÅÄÖåäöa-zA-Z0-9/.\- :]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Date time with label type
+    ISO 8601 with date, time and timezone
+    -->
+    <xs:simpleType name="ISO8601DateTimeWithOptionalTimezoneType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})?"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Protected personal data
+    Only allows the field to have the value true, if the field does not exist it must be considered false
+    -->
+    <xs:simpleType name="protectedPersonalDataType">
+        <xs:restriction base="xs:boolean">
+            <xs:pattern value="true"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Non-empty string
+    Used in stringWithLabelType
+    -->
+    <xs:simpleType name="nonEmptyStringType">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

@@ -25,13 +25,42 @@
 		</repository>
 	</repositories>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>21</java.version>
 		<springboot.version>3.4.0</springboot.version>
 		<commons.fileupload.version>2.0.0-M4</commons.fileupload.version>
 	</properties>
 	<profiles>
+    <profile>
+      <id>debug</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <version>${springboot.version}</version>
+            <configuration>
+              <skip>false</skip>
+              <additionalClasspathElements>
+                <additionalClasspathElement>
+                  ${project.build.directory}/${project.build.finalName}
+                </additionalClasspathElement>
+              </additionalClasspathElements>
+              <jvmArguments>
+                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5007
+                <!-- Remove after upgrade to spring-boot 3-->
+                -Dorg.springframework.boot.logging.LoggingSystem=none
+                <!-- Remove -->
+                -Droda.environment.collect.version=false
+                --add-opens java.base/java.util=ALL-UNNAMED
+                --add-opens java.base/java.lang=ALL-UNNAMED
+              </jvmArguments>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
 		<profile>
-			<id>debug-main-suspend</id>
+			<id>debug-suspend</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -46,7 +75,7 @@
 								</additionalClasspathElement>
 							</additionalClasspathElements>
 							<jvmArguments>
-								-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5005
+								-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=*:5007
 								<!-- Remove after upgrade to spring-boot 3-->
 								-Dorg.springframework.boot.logging.LoggingSystem=none
 								<!-- Remove -->
@@ -61,10 +90,12 @@
 		</profile>
 	</profiles>
 	<dependencies>
+    <!--
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		-->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -88,6 +119,16 @@
 			<version>33.5.0-jre</version>
 		</dependency>
 
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-codec-http</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>1.28.0</version>
+    </dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-fileupload2-core</artifactId>
@@ -104,7 +145,132 @@
 			<artifactId>roda-common-data</artifactId>
 			<version>0.4.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.roda-community</groupId>
+			<artifactId>commons-ip2</artifactId>
+			<version>2.10.0</version>
+		</dependency>
 	</dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <!--
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <version>3.5.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webflux</artifactId>
+        <version>3.5.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-reactor-netty</artifactId>
+        <version>3.5.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter</artifactId>
+        <version>3.5.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot</artifactId>
+        <version>3.5.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>6.2.12</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-web</artifactId>
+        <version>6.2.12</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>6.2.12</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webflux</artifactId>
+        <version>6.2.12</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-beans</artifactId>
+        <version>6.2.12</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.tomcat.embed</groupId>
+        <artifactId>tomcat-embed-core</artifactId>
+        <version>10.1.48</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.projectreactor.netty</groupId>
+        <artifactId>reactor-netty-http</artifactId>
+        <version>1.2.11</version>
+      </dependency>
+      <dependency>
+        <groupId>io.projectreactor.netty</groupId>
+        <artifactId>reactor-netty-core</artifactId>
+        <version>1.2.11</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-handler</artifactId>
+        <version>4.1.128.Final</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-common</artifactId>
+        <version>4.1.128.Final</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-codec-http</artifactId>
+        <version>4.1.128.Final</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.minidev</groupId>
+        <artifactId>json-smart</artifactId>
+        <version>2.5.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.xmlunit</groupId>
+        <artifactId>xmlunit-core</artifactId>
+        <version>2.11.0</version>
+        <scope>test</scope>
+      </dependency>
+      -->
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.18.0</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.5.20</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>1.5.20</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
 	<build>
 		<plugins>
@@ -112,7 +278,16 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-		</plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>25</source>
+          <target>25</target>
+          <compilerArgs>--enable-preview</compilerArgs>
+        </configuration>
+      </plugin>
+    </plugins>
 	</build>
 
 </project>

@@ -1,4 +1,4 @@
-package com.example.restservice.model.upload;
+package com.example.restservice.model.upload.old;
 
 import com.google.common.collect.ImmutableSet;
 

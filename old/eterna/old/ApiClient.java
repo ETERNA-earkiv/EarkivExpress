@@ -1,17 +1,15 @@
-package com.example.restservice.eterna;
+package com.example.restservice.eterna.old;
 
+import com.example.restservice.eterna.NamedInputStreamResource;
 import java.io.InputStream;
-import java.nio.file.WatchEvent;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ReactiveHttpOutputMessage;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -27,10 +25,6 @@ public class ApiClient {
 
   public static ApiClientBuilder builder() {
     return new ApiClientBuilder();
-  }
-
-  public WebClient getWebClient() {
-    return webClient;
   }
 
   public void createTransferredResourceDirectory(String name) {
@@ -63,22 +57,7 @@ public class ApiClient {
     System.out.println("test");
   }
 
-  public void uploadTransferredResourceX(String name, InputStream inputStream) {
-    MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-    multipartBodyBuilder.part("upl", new InputStreamResource(inputStream)).filename(name);
-
-    MultiValueMap<String, HttpEntity<?>> multipartBody = multipartBodyBuilder.build();
-
-    TransferredResource response = webClient.post()
-        .uri(uriBuilder -> uriBuilder.path("/controller/v1/transfers/").build())
-        .contentType(MediaType.MULTIPART_FORM_DATA)
-        .body(BodyInserters.fromMultipartData(multipartBody)).retrieve()
-        .bodyToMono(TransferredResource.class).block();
-
-    System.out.println("test");
-  }
-
-  public Mono<TransferredResource> uploadTransferredResourceX(String name, Flux<DataBuffer> bufferFlux) {
+  public Mono<TransferredResource> uploadTransferredResource(String name, Flux<DataBuffer> bufferFlux) {
     MultipartBodyBuilder builder = new MultipartBodyBuilder();
     builder.part("upl", BodyInserters.fromPublisher(bufferFlux, DataBuffer.class))
         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -96,7 +75,7 @@ public class ApiClient {
     return response;
   }
 
-  public void uploadTransferredResourceX(String name, String parentUUID, InputStream inputStream) {
+  public void uploadTransferredResource(String name, String parentUUID, InputStream inputStream) {
     webClient.post().uri(
             uriBuilder -> uriBuilder.path("/controller/v1/transfers/").queryParam("parentUUID", parentUUID)
                 .build()).contentType(MediaType.MULTIPART_FORM_DATA).body(
@@ -105,6 +84,7 @@ public class ApiClient {
   }
 
   public static class ApiClientBuilder {
+
     private final WebClient.Builder webClientBuilder;
 
     public ApiClientBuilder() {

@@ -1,4 +1,4 @@
-package com.example.restservice.model.upload;
+package com.example.restservice.model.upload.old;
 
 import java.util.Collections;
 import java.util.HashMap;
