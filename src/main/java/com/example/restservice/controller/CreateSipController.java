@@ -1,9 +1,11 @@
 package com.example.restservice.controller;
 
+import com.example.restservice.eterna.EternaConfig;
 import com.example.restservice.manager.CreateSipManager;
 import com.example.restservice.sipbuilder.SipBuilder;
 import com.example.restservice.model.upload.SipCreateField;
 import com.example.restservice.writers.EternaTransferredResourceWriter;
+import org.springframework.web.bind.annotation.GetMapping;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -19,7 +21,36 @@ import reactor.core.scheduler.Schedulers;
 
 @RestController
 public class CreateSipController {
-  private final CreateSipManager createSipManager = new CreateSipManager();
+  private final CreateSipManager createSipManager;
+  private final EternaConfig eternaConfig;
+
+  public CreateSipController(CreateSipManager createSipManager, EternaConfig eternaConfig) {
+    this.createSipManager = createSipManager;
+    this.eternaConfig = eternaConfig;
+  }
+
+  @GetMapping("/api/config/eterna")
+  public EternaConfigInfo getEternaConfig() {
+    return new EternaConfigInfo(eternaConfig.getBaseUrl(), eternaConfig.getUsername());
+  }
+
+  public static class EternaConfigInfo {
+    private final String baseUrl;
+    private final String username;
+
+    public EternaConfigInfo(String baseUrl, String username) {
+      this.baseUrl = baseUrl;
+      this.username = username;
+    }
+
+    public String getBaseUrl() {
+      return baseUrl;
+    }
+
+    public String getUsername() {
+      return username;
+    }
+  }
 
   @PostMapping(path = "api/sip/create")
   public Mono<Void> createSip(@RequestBody Flux<PartEvent> events) {
