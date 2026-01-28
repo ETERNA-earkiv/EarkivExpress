@@ -1,9 +1,11 @@
 package com.example.restservice.manager;
 
+import com.example.restservice.eterna.EternaConfig;
 import com.example.restservice.sipbuilder.SipBuilder;
 import com.example.restservice.writers.EternaTransferredResourceWriter;
 import com.example.restservice.writers.SipOutputWriter;
 import com.example.restservice.xml.StaxXmlValidator;
+import org.springframework.stereotype.Component;
 import java.net.URL;
 import javax.xml.XMLConstants;
 import javax.xml.validation.Schema;
@@ -14,6 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+@Component
 public class CreateSipManager {
 
   private final SipOutputWriter outputWriter;
@@ -23,8 +26,8 @@ public class CreateSipManager {
   private StaxXmlValidator xmlValidator;
   private Mono<Void> currentWriteMono;
 
-  public CreateSipManager() {
-    this.outputWriter = new EternaTransferredResourceWriter();
+  public CreateSipManager(EternaConfig eternaConfig) {
+    this.outputWriter = new EternaTransferredResourceWriter(eternaConfig);
 
     URL schemaURL = Thread.currentThread().getContextClassLoader()
         .getResource("schemas/pgip_1.3.xsd");
