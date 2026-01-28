@@ -2,6 +2,7 @@ package com.example.restservice.writers;
 
 import com.example.restservice.PgipSipStream.DataBufferOutputStream;
 import com.example.restservice.eterna.ApiClient;
+import com.example.restservice.eterna.EternaConfig;
 import com.example.restservice.exception.UploadFailureException;
 import com.example.restservice.sipbuilder.SipBuilder;
 import java.util.concurrent.Executor;
@@ -25,8 +26,13 @@ public class EternaTransferredResourceWriter implements SipOutputWriter {
 
   private static final DataBufferFactory BUFFER_FACTORY = new DefaultDataBufferFactory();
 
+  private final EternaConfig eternaConfig;
   private ZipArchiveOutputStream zipArchiveOutputStream;
   private Flux<DataBuffer> dataBufferFlux;
+
+  public EternaTransferredResourceWriter(EternaConfig eternaConfig) {
+    this.eternaConfig = eternaConfig;
+  }
 
   public Flux<DataBuffer> test() {
     DataBufferOutputStream outputStream = new DataBufferOutputStream(BUFFER_FACTORY);
@@ -48,9 +54,7 @@ public class EternaTransferredResourceWriter implements SipOutputWriter {
     Executor executor =
         command -> Schedulers.boundedElastic().schedule(command);
 
-    ApiClient apiClient = ApiClient.builder().baseUrl("http://localhost:8080/")
-        .setBasicAuth("admin", "roda").build();
-
+    ApiClient apiClient = eternaConfig.createApiClient();
     WebClient webClient = apiClient.getWebClient();
 
     MultipartBodyBuilder builder = new MultipartBodyBuilder();
