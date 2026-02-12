@@ -88,5 +88,8 @@ public class DataBufferOutputStream extends OutputStream {
     flushCurrent();
     DataBufferUtils.release(currentBuffer);
     closed = true;
+    if (sink != null) {
+      sink.complete();
+    }
   }
 }

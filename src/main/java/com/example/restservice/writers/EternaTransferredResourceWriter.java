@@ -10,6 +10,7 @@ import java.util.function.Function;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -57,21 +58,37 @@ public class EternaTransferredResourceWriter implements SipOutputWriter {
     ApiClient apiClient = eternaConfig.createApiClient();
     WebClient webClient = apiClient.getWebClient();
 
-    MultipartBodyBuilder builder = new MultipartBodyBuilder();
-    builder.part("upl", BodyInserters.fromDataBuffers(dataBufferFlux))
-        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
-        .filename("test.zip");
+    System.out.println("Starting ETERNA upload - collecting data");
+    // Collect all DataBuffers into a single Flux and convert to byte array
+    Mono<byte[]> dataMono = dataBufferFlux
+        .doOnNext(buffer -> System.out.println("Received data buffer: " + buffer.readableByteCount() + " bytes"))
+        .collectList()
+        .doOnNext(buffers -> System.out.println("Collected " + buffers.size() + " data buffers"))
+        .map(dataBuffers -> {
+            int totalSize = dataBuffers.stream().mapToInt(DataBuffer::readableByteCount).sum();
+            byte[] result = new byte[totalSize];
+            int offset = 0;
+            for (DataBuffer buffer : dataBuffers) {
+                int length = buffer.readableByteCount();
+                buffer.read(result, offset, length);
+                offset += length;
+                DataBufferUtils.release(buffer);
+            }
+            System.out.println("Collected " + totalSize + " bytes for upload");
+            return result;
+        });
 
-    MultiValueMap<String, HttpEntity<?>> multipartBody = builder.build();
-
-    Mono<Void> uploadMono =
-        webClient.post()
+    Mono<Void> uploadMono = dataMono.flatMap(data -> {
+        System.out.println("Sending SIP data to ETERNA (" + data.length + " bytes)");
+        return webClient.post()
             .uri("/controller/v1/transfers/")
-            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-            .body(BodyInserters.fromMultipartData(multipartBody))
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .body(BodyInserters.fromMultipartData("upl", data))
             .retrieve()
             .bodyToMono(Void.class)
-            .onErrorMap(UploadFailureException::new);
+            .doOnSuccess(v -> System.out.println("ETERNA upload completed successfully"))
+            .doOnError(e -> System.err.println("ETERNA upload failed: " + e.getMessage()));
+    }).onErrorMap(UploadFailureException::new);
 
     return Mono.just(uploadMono);
   }

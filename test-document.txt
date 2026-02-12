@@ -1,0 +1,11 @@
+This is a test document for the SIP creation workflow.
+
+Created: 2026-02-12
+Purpose: Testing EarkivExpress SIP creation and upload to ETERNA
+
+This document contains sample content to verify that:
+- File upload works
+- SIP packaging works
+- ETERNA integration works
+
+End of test document.

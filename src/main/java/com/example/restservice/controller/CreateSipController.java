@@ -5,7 +5,10 @@ import com.example.restservice.manager.CreateSipManager;
 import com.example.restservice.sipbuilder.SipBuilder;
 import com.example.restservice.model.upload.SipCreateField;
 import com.example.restservice.writers.EternaTransferredResourceWriter;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -34,6 +37,29 @@ public class CreateSipController {
     return new EternaConfigInfo(eternaConfig.getBaseUrl(), eternaConfig.getUsername());
   }
 
+  @GetMapping("/api/config/eterna/test")
+  @ResponseBody
+  public Mono<ResponseEntity<EternaConnectionTest>> testEternaConnection() {
+    return Mono.fromCallable(() -> {
+      try {
+        String testName = "test-connection-" + System.currentTimeMillis();
+        System.out.println("Creating test transfer directory: " + testName);
+
+        // Try to create a test directory to verify connection
+        eternaConfig.createApiClient().createTransferredResourceDirectory(testName);
+
+        System.out.println("Successfully created test transfer directory: " + testName);
+        return ResponseEntity
+            .ok(new EternaConnectionTest(true, "Connection successful - directory '" + testName + "' created", null));
+      } catch (Exception e) {
+        System.err.println("Failed to create test transfer directory: " + e.getMessage());
+        e.printStackTrace();
+        return ResponseEntity
+            .ok(new EternaConnectionTest(false, "Connection failed: " + e.getMessage(), e.getClass().getSimpleName()));
+      }
+    });
+  }
+
   public static class EternaConfigInfo {
     private final String baseUrl;
     private final String username;
@@ -52,8 +78,39 @@ public class CreateSipController {
     }
   }
 
+  public static class EternaConnectionTest {
+    private final boolean connected;
+    private final String message;
+    private final String errorType;
+
+    public EternaConnectionTest(boolean connected, String message, String errorType) {
+      this.connected = connected;
+      this.message = message;
+      this.errorType = errorType;
+    }
+
+    public boolean isConnected() {
+      return connected;
+    }
+
+    public String getMessage() {
+      return message;
+    }
+
+    public String getErrorType() {
+      return errorType;
+    }
+  }
+
+  @PostMapping(path = "api/sip/test")
+  public Mono<String> testSipEndpoint() {
+    System.out.println("Test SIP endpoint called");
+    return Mono.just("Test endpoint working");
+  }
+
   @PostMapping(path = "api/sip/create")
   public Mono<Void> createSip(@RequestBody Flux<PartEvent> events) {
+    System.out.println("SIP creation request received");
     AtomicReference<SipCreateField> lastFieldRef = new AtomicReference<>(SipCreateField.NONE);
 
     return events
@@ -75,9 +132,8 @@ public class CreateSipController {
           }
 
           Mono<Mono<Void>> mono = switch (currentField) {
-            case JOB -> createSipManager.newSipBuilder().doOnNext((a) ->
-                createSipManager.processJob(event, partEvents)
-            ).then(Mono.just(Mono.<Void>empty()));
+            case JOB -> createSipManager.newSipBuilder().doOnNext((a) -> createSipManager.processJob(event, partEvents))
+                .then(Mono.just(Mono.<Void>empty()));
             case PGIP -> createSipManager.processPgip(event, partEvents).then(Mono.just(Mono.<Void>empty()));
             case FILE -> createSipManager.processFile(event, partEvents).then(Mono.just(Mono.<Void>empty()));
 

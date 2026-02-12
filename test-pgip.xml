@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pgip xmlns="http://www.projectroda.eu/schemas/PGIP/v1.3"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.projectroda.eu/schemas/PGIP/v1.3 pgip_1.3.xsd">
+  <objectId>Test-SIP-001</objectId>
+  <title>Test SIP for EarkivExpress</title>
+  <description>This is a test SIP created to verify the EarkivExpress workflow</description>
+  <securityClassification>Public</securityClassification>
+  <creator>Test Creator</creator>
+  <conformsTo>PGIP-1.3</conformsTo>
+  <informationOwner>Test Organization</informationOwner>
+  <legalRestriction>No restrictions</legalRestriction>
+  <submissionAgreementId>SA-001</submissionAgreementId>
+  <type>Document</type>
+</pgip>

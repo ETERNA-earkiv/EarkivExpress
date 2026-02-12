@@ -40,11 +40,13 @@ public class CreateSipManager {
   }
 
   public Mono<Void> newSipBuilder() {
+    System.out.println("Creating new SIP builder");
     currentSipBuilder = new SipBuilder();
 
 
     return ((EternaTransferredResourceWriter) outputWriter).test().then(
         outputWriter.startWriter(zipArchiveOutputStream -> {
+              System.out.println("Setting up ZIP archive output stream");
               currentSipBuilder.setZipArchiveOutputStream(zipArchiveOutputStream);
               xmlValidator = xmlSchema != null ? new StaxXmlValidator(xmlSchema) : null;
               return currentSipBuilder;
