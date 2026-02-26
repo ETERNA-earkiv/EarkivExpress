@@ -10,13 +10,11 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import com.example.restservice.util.ZipValidator;
+import com.example.restservice.util.PgipXmlValidator;
+import com.example.restservice.util.PgipXmlValidator.ValidationResult;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 @RestController
 @RequestMapping("/api/sip")
@@ -111,6 +109,21 @@ public class UploadSipController {
             if (!ZipValidator.hasPgipMetadata(zipBytes)) {
               return Mono.just(ResponseEntity.badRequest()
                   .body("ZIP must contain pgip.xml metadata file"));
+            }
+            
+            // Extract and validate pgip.xml against XSD schema
+            byte[] pgipXmlBytes = ZipValidator.extractPgipXml(zipBytes);
+            if (pgipXmlBytes != null) {
+              try {
+                ValidationResult validationResult = PgipXmlValidator.validate(pgipXmlBytes);
+                if (!validationResult.isValid()) {
+                  return Mono.just(ResponseEntity.badRequest()
+                      .body("Invalid pgip.xml: " + validationResult.getErrorMessage()));
+                }
+              } catch (Exception e) {
+                return Mono.just(ResponseEntity.badRequest()
+                    .body("Failed to validate pgip.xml: " + e.getMessage()));
+              }
             }
             
             // Upload the ZIP to Eterna
