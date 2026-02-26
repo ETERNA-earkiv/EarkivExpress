@@ -66,7 +66,7 @@ public class EternaTransferredResourceWriter implements SipOutputWriter {
 
     Mono<Void> uploadMono =
         webClient.post()
-            .uri("/controller/v1/transfers/")
+            .uri("/api/v1/transfers/")
             .contentType(MediaType.APPLICATION_OCTET_STREAM)
             .body(BodyInserters.fromMultipartData(multipartBody))
             .retrieve()
