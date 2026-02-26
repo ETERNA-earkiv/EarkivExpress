@@ -28,6 +28,14 @@ Fixed Eterna API URLs from `/controller/v1/transfers/` to `/api/v1/transfers/` i
 - `ApiClient.java`
 - `EternaTransferredResourceWriter.java`
 
+### 4. ZIP Validation
+
+- **ZIP validation utility**: `ZipValidator.java` validates ZIP contains pgip.xml
+- **XML Schema validation**: `PgipXmlValidator.java` validates pgip.xml against `pgip_1.3.xsd`
+- Upload is rejected (400) if:
+  - ZIP doesn't contain pgip.xml
+  - pgip.xml doesn't conform to the XSD schema
+
 ---
 
 ## Prerequisites
@@ -134,13 +142,27 @@ Expected response:
 File uploaded successfully: custom-name.txt (Eterna ID: custom-name.txt)
 ```
 
-### 4. Upload a ZIP as SIP
+### 4. Upload a ZIP as SIP (with validation)
 
-First, create a test ZIP:
+First, create a test ZIP with pgip.xml:
 ```bash
 mkdir -p /tmp/test-sip
-echo "Document 1" > /tmp/test-sip/doc1.txt
-echo "Document 2" > /tmp/test-sip/doc2.txt
+cat > /tmp/test-sip/pgip.xml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<pgip>
+  <objectId>TEST-2026-001</objectId>
+  <title>Test Submission</title>
+  <securityClassification>ÖPPEN</securityClassification>
+  <caseType>Test Case</caseType>
+  <creator>Test Creator</creator>
+  <conformsTo>PGIP 1.3</conformsTo>
+  <informationOwner>Test Owner</informationOwner>
+  <legalRestriction>No restrictions</legalRestriction>
+  <submissionAgreementId>SA-001</submissionAgreementId>
+  <type>ARKIV</type>
+</pgip>
+EOF
+echo "Document" > /tmp/test-sip/doc.txt
 cd /tmp/test-sip && zip -r /tmp/archive.zip .
 ```
 
@@ -150,6 +172,10 @@ curl -F "zip=@/tmp/archive.zip" \
      -F "sipName=my-sip" \
      http://localhost:8085/api/sip/upload-zip
 ```
+
+**Validation errors:**
+- No pgip.xml: `ZIP must contain pgip.xml metadata file`
+- Invalid pgip.xml: `Invalid pgip.xml: [validation error message]`
 
 Expected response:
 ```
@@ -208,6 +234,8 @@ Expected response:
 
 ### New Files
 - `src/main/java/com/example/restservice/controller/UploadSipController.java` - Upload endpoints
+- `src/main/java/com/example/restservice/util/ZipValidator.java` - ZIP validation utility
+- `src/main/java/com/example/restservice/util/PgipXmlValidator.java` - XML schema validation
 
 ### Modified Files
 - `src/main/java/com/example/restservice/eterna/ApiClient.java` - Fixed API URLs
