@@ -9,6 +9,8 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import com.example.restservice.util.ZipValidator;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -105,17 +107,10 @@ public class UploadSipController {
           }
           
           try {
-            // Verify it's a valid ZIP
-            try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
-              ZipEntry entry;
-              int fileCount = 0;
-              while ((entry = zis.getNextEntry()) != null) {
-                fileCount++;
-              }
-              if (fileCount == 0) {
-                return Mono.just(ResponseEntity.badRequest()
-                    .body("ZIP file is empty"));
-              }
+            // Validate ZIP contains pgip.xml
+            if (!ZipValidator.hasPgipMetadata(zipBytes)) {
+              return Mono.just(ResponseEntity.badRequest()
+                  .body("ZIP must contain pgip.xml metadata file"));
             }
             
             // Upload the ZIP to Eterna
