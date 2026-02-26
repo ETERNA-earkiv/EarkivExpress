@@ -24,6 +24,18 @@ public class ZipValidator {
         }
     }
 
+    public static byte[] extractPgipXml(byte[] zipBytes) throws IOException {
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                if (isPgipFile(entry.getName())) {
+                    return zis.readAllBytes();
+                }
+            }
+            return null;
+        }
+    }
+
     private static boolean isPgipFile(String name) {
         String lowerName = name.toLowerCase();
         return lowerName.endsWith("/" + PGIP_XML) || 
