@@ -35,32 +35,30 @@ public class ApiClient {
 
   public void createTransferredResourceDirectory(String name) {
     webClient.post()
-        .uri(uriBuilder -> uriBuilder.path("/controller/v1/transfers/").queryParam("name", name).build())
+        .uri(uriBuilder -> uriBuilder.path("/api/v1/transfers/").queryParam("name", name).build())
         .contentType(MediaType.MULTIPART_FORM_DATA).body(BodyInserters.fromMultipartData("upl", ""))
         .retrieve();
   }
 
   public void createTransferredResourceDirectory(String name, String parentUUID) {
     webClient.post().uri(
-            uriBuilder -> uriBuilder.path("/controller/v1/transfers/").queryParam("name", name)
+            uriBuilder -> uriBuilder.path("/api/v1/transfers/").queryParam("name", name)
                 .queryParam("parentUUID", parentUUID).build())
         .contentType(MediaType.MULTIPART_FORM_DATA).body(BodyInserters.fromMultipartData("upl", ""))
         .retrieve();
   }
 
-  public void uploadTransferredResource(String name, InputStream inputStream) {
+  public Mono<TransferredResource> uploadTransferredResource(String name, InputStream inputStream) {
     MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
     multipartBodyBuilder.part("upl", new InputStreamResource(inputStream)).filename(name);
 
     MultiValueMap<String, HttpEntity<?>> multipartBody = multipartBodyBuilder.build();
 
-    TransferredResource response = webClient.post()
-        .uri(uriBuilder -> uriBuilder.path("/controller/v1/transfers/").build())
+    return webClient.post()
+        .uri(uriBuilder -> uriBuilder.path("/api/v1/transfers/").build())
         .contentType(MediaType.MULTIPART_FORM_DATA)
         .body(BodyInserters.fromMultipartData(multipartBody)).retrieve()
-        .bodyToMono(TransferredResource.class).block();
-
-    System.out.println("test");
+        .bodyToMono(TransferredResource.class);
   }
 
   public void uploadTransferredResourceX(String name, InputStream inputStream) {
@@ -70,7 +68,7 @@ public class ApiClient {
     MultiValueMap<String, HttpEntity<?>> multipartBody = multipartBodyBuilder.build();
 
     TransferredResource response = webClient.post()
-        .uri(uriBuilder -> uriBuilder.path("/controller/v1/transfers/").build())
+        .uri(uriBuilder -> uriBuilder.path("/api/v1/transfers/").build())
         .contentType(MediaType.MULTIPART_FORM_DATA)
         .body(BodyInserters.fromMultipartData(multipartBody)).retrieve()
         .bodyToMono(TransferredResource.class).block();
@@ -87,7 +85,7 @@ public class ApiClient {
     MultiValueMap<String, HttpEntity<?>> multipartBody = builder.build();
 
     Mono<TransferredResource> response = webClient.post()
-        .uri(uriBuilder -> uriBuilder.path("/controller/v1/transfers/").build())
+        .uri(uriBuilder -> uriBuilder.path("/api/v1/transfers/").build())
         .contentType(MediaType.MULTIPART_FORM_DATA)
         .body(BodyInserters.fromMultipartData(multipartBody))
         .retrieve()
@@ -98,7 +96,7 @@ public class ApiClient {
 
   public void uploadTransferredResourceX(String name, String parentUUID, InputStream inputStream) {
     webClient.post().uri(
-            uriBuilder -> uriBuilder.path("/controller/v1/transfers/").queryParam("parentUUID", parentUUID)
+            uriBuilder -> uriBuilder.path("/api/v1/transfers/").queryParam("parentUUID", parentUUID)
                 .build()).contentType(MediaType.MULTIPART_FORM_DATA).body(
             BodyInserters.fromMultipartData("upl", new NamedInputStreamResource(name, inputStream)))
         .retrieve();
